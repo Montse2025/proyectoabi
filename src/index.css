@@ -1,0 +1,37 @@
+/* Estilo global del body */
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif; /* Usamos una fuente clara y accesible */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fff3e0; /* Fondo suave color melón */
+  color: #333333; /* Color de texto oscuro para contraste */
+}
+
+/* Color de enlaces global */
+a {
+  color: #ff6f00; /* Naranja */
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #e65100; /* Naranja más oscuro al pasar el ratón */
+}
+
+/* Estilo para el texto de código */
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+button:hover {
+  background-color: #e65100; /* Naranja más oscuro */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #ff6f00; /* Bordes naranjas al hacer foco */
+}
