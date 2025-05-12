@@ -1,13 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+// /*index.js */
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { orange, blue } from "@mui/material/colors"; // Importa paletas de colores de MUI
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// Define tu tema personalizado
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: blue[500], // Un tono de azul como primario
+    },
+    secondary: {
+      main: orange[500], // El naranja que ya usabas como secundario o acento
+    },
+    // Puedes definir más tonos si lo necesitas, como light, dark, contrastText
+  },
+  typography: {
+    fontFamily: "Oswald, sans-serif", // Establece Oswald como la fuente principal
+  },
+});
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );
 

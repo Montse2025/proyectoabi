@@ -1,4 +1,4 @@
-// Principal.js
+//Principal.js
 import React from "react";
 import { Container, Paper, Typography, Grid, Box } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ const Principal = ({ setUpdate }) => {
       label: "Registrar Datos",
       to: "/registrar-datos",
       icon: <AssignmentIcon sx={{ fontSize: 40, color: "#FFF" }} />,
-      bgColor: "#90CAF9",
+      bgColor: "#1E88E5", // Azul más intenso
     },
     ...(usuario?.role !== "verificador"
       ? [
@@ -37,7 +37,7 @@ const Principal = ({ setUpdate }) => {
             label: "Registrar Plan",
             to: "/form1",
             icon: <PlaylistAddCheckIcon sx={{ fontSize: 40, color: "#FFF" }} />,
-            bgColor: "#A5D6A7",
+            bgColor: "#43A047", // Verde más intenso
           },
         ]
       : []),
@@ -45,13 +45,13 @@ const Principal = ({ setUpdate }) => {
       label: "Ver Datos",
       to: "/datos",
       icon: <BookIcon sx={{ fontSize: 40, color: "#FFF" }} />,
-      bgColor: "#FFF59D",
+      bgColor: "#FFCA28", // Amarillo más intenso
     },
     {
       label: "Salir",
       icon: <LogoutIcon sx={{ fontSize: 40, color: "#FFF" }} />,
       onClick: handleLogout,
-      bgColor: "#F44336",
+      bgColor: "#D32F2F", // Rojo más intenso
     },
   ];
 

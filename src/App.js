@@ -1,3 +1,4 @@
+/*App.js */
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -11,7 +12,6 @@ import {
   AppBar,
   Toolbar,
   Button,
-  Box,
   Typography,
   Container,
   TextField,
@@ -19,15 +19,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Box,
 } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home"; // Importamos el ícono de casa
-import Form1 from "./Views/Form1"; // Importamos Form1 desde su archivo correspondiente
-import DataView from "./Views/DataView"; // Importa el componente correcto
-import Login from "./Sesion/Login"; // Importamos Login.js
-import { fakeAuth } from "./Sesion/Managements"; // Importamos fakeAuth desde Managements.js
-import Principal from "./Views/Principal"; // Importamos Principal.js
-import Form2 from "./Views/Form2"; // Importamos Form2.js
-import Datos from "./Views/Datos"; // Importamos Datos.js
+import HomeIcon from "@mui/icons-material/Home";
+import MenuIcon from "@mui/icons-material/Menu";
+import Form1 from "./Views/Form1";
+import DataView from "./Views/DataView";
+import Login from "./Sesion/Login";
+import { fakeAuth } from "./Sesion/Managements";
+import Principal from "./Views/Principal";
+import Form2 from "./Views/Form2";
+import Datos from "./Views/Datos";
+import PaginaPrincipal from "./Views/PaginaPrincipal"; // Importamos el nuevo componente
 
 // Componente de navegación
 const Navigation = ({ setUpdate }) => {
@@ -35,31 +38,51 @@ const Navigation = ({ setUpdate }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleLogout = () => {
-    setOpenDialog(true); // Mostrar el diálogo
+    setOpenDialog(true);
   };
 
   const confirmLogout = () => {
-    fakeAuth.logout(navigate, setUpdate); // Usamos la función setUpdate pasada como prop
+    fakeAuth.logout(navigate, setUpdate);
     setOpenDialog(false);
   };
 
   const cancelLogout = () => {
-    setOpenDialog(false); // Cerrar sin hacer logout
+    setOpenDialog(false);
   };
 
   return (
     <>
       <AppBar position="fixed" sx={{ backgroundColor: "#FF7043" }}>
-        <Toolbar sx={{ justifyContent: "center" }}>
-          {/* Botón de menú principal (casa) */}
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {/* Botón de gestión (ahora como página principal) */}
+            <Button
+              color="inherit"
+              component={Link}
+              to="/principal"
+              sx={{ fontWeight: "bold", color: "#FFF" }}
+            >
+              <HomeIcon sx={{ mr: 1 }} />
+              Principal
+            </Button>
+            {/* Botón de menú principal (ahora contendrá el contenido de "Gestión") */}
+            <Button
+              color="inherit"
+              component={Link}
+              to="/gestion"
+              sx={{ fontWeight: "bold", color: "#FFF" }}
+            >
+              <MenuIcon sx={{ mr: 1 }} />
+              Menú Principal
+            </Button>
+          </Box>
+          {/* Botón de cerrar sesión */}
           <Button
             color="inherit"
-            component={Link}
-            to="/principal"
+            onClick={handleLogout}
             sx={{ fontWeight: "bold", color: "#FFF" }}
           >
-            <HomeIcon sx={{ mr: 1 }} /> {/* Icono de casa */}
-            Menú Principal
+            Cerrar Sesión
           </Button>
         </Toolbar>
       </AppBar>
@@ -98,59 +121,72 @@ const App = () => {
 
   return (
     <Router>
-      {fakeAuth.isAuthenticated && <Navigation setUpdate={setUpdate} />}{" "}
-      {/* Pasamos setUpdate a Navigation */}
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            fakeAuth.isAuthenticated ? (
-              <Navigate to="/principal" />
-            ) : (
-              <Login setUpdate={setUpdate} />
-            )
-          }
-        />
-        <Route
-          path="/principal"
-          element={
-            fakeAuth.isAuthenticated ? (
-              <Principal setUpdate={setUpdate} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
-          path="/form1"
-          element={
-            fakeAuth.isAuthenticated ? (
-              <Form1 setUpdate={setUpdate} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
-          path="/form2/:id"
-          element={
-            fakeAuth.isAuthenticated ? <Form2 /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/registrar-datos"
-          element={
-            fakeAuth.isAuthenticated ? <Datos /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/datos"
-          element={
-            fakeAuth.isAuthenticated ? <DataView /> : <Navigate to="/login" />
-          }
-        />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
+      {fakeAuth.isAuthenticated && <Navigation setUpdate={setUpdate} />}
+      <Box sx={{ paddingTop: "64px" }}>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              fakeAuth.isAuthenticated ? (
+                <Navigate to="/principal" />
+              ) : (
+                <Login setUpdate={setUpdate} />
+              )
+            }
+          />
+          {/* Moviendo el contenido de /principal a /gestion */}
+          <Route
+            path="/gestion"
+            element={
+              fakeAuth.isAuthenticated ? (
+                <Principal setUpdate={setUpdate} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          {/* La ruta /principal ahora renderiza PaginaPrincipal */}
+          <Route
+            path="/principal"
+            element={
+              fakeAuth.isAuthenticated ? (
+                <PaginaPrincipal /> // Usamos el nuevo componente aquí
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/form1"
+            element={
+              fakeAuth.isAuthenticated ? (
+                <Form1 setUpdate={setUpdate} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/form2/:id"
+            element={
+              fakeAuth.isAuthenticated ? <Form2 /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/registrar-datos"
+            element={
+              fakeAuth.isAuthenticated ? <Datos /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/datos"
+            element={
+              fakeAuth.isAuthenticated ? <DataView /> : <Navigate to="/login" />
+            }
+          />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      </Box>
     </Router>
   );
 };

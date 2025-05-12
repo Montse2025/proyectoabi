@@ -1,3 +1,4 @@
+//DataView.js
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -16,6 +17,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import { db } from "../firebaseConfig";
 import {
@@ -26,6 +31,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
 const DataView = () => {
   const [data, setData] = useState([]);
@@ -35,6 +41,7 @@ const DataView = () => {
   const [recordToDelete, setRecordToDelete] = useState(null);
   const [docenteData, setDocenteData] = useState({});
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const fetchData = async () => {
     setLoading(true);
@@ -115,73 +122,99 @@ const DataView = () => {
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Paper
         elevation={5}
-        sx={{ p: 8, borderRadius: 3, backgroundColor: "#FFF3E0" }}
+        sx={{ p: 4, borderRadius: 3, backgroundColor: "#FFF3E0" }}
       >
         <Typography
           variant="h4"
           gutterBottom
           align="center"
-          sx={{ fontWeight: "bold", color: "#FF7043" }}
+          sx={{ fontWeight: "bold", color: theme.palette.secondary.main }}
         >
           Datos del Docente y Planes Educativos
         </Typography>
 
         {errorMessage && (
-          <Alert
-            severity="error"
-            sx={{ backgroundColor: "#FF7043", color: "#FFF" }}
-          >
+          <Alert severity="error" sx={{ mb: 2 }}>
             {errorMessage}
           </Alert>
         )}
 
         {loading ? (
           <CircularProgress
-            sx={{ color: "#FF7043", margin: "auto", display: "block" }}
+            color="secondary"
+            sx={{ margin: "auto", display: "block" }}
           />
         ) : (
           <div>
             {/* Mostrar los datos del docente */}
-            <Paper sx={{ mb: 4, p: 3, backgroundColor: "#FFEBEE" }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            <Paper
+              elevation={3}
+              sx={{ mb: 4, p: 3, backgroundColor: "#F5F5F5" }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+              >
                 Datos del Docente
               </Typography>
-              <Typography>
-                <strong>Nombre:</strong> {docenteData.nombre}
-              </Typography>
-              <Typography>
-                <strong>Cédula:</strong> {docenteData.cedula}
-              </Typography>
-              <Typography>
-                <strong>Facultad:</strong> {docenteData.facultad}
-              </Typography>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={12} sm={6}>
+                  <Typography>
+                    <strong>Nombre:</strong> {docenteData.nombre}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography>
+                    <strong>Cédula:</strong> {docenteData.cedula}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>
+                    <strong>Facultad:</strong> {docenteData.facultad}
+                  </Typography>
+                </Grid>
+              </Grid>
 
               {/* Mostrar las carreras y materias */}
-              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 2 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  mt: 2,
+                  color: theme.palette.primary.main,
+                }}
+              >
                 Carreras
               </Typography>
               {docenteData.carreras && docenteData.carreras.length > 0 ? (
-                docenteData.carreras.map((carrera, index) => (
-                  <div key={index}>
-                    <Typography>
-                      <strong>{carrera.nombre}</strong>
-                    </Typography>
-                    <ul>
-                      {carrera.materias?.map((materia, idx) => (
-                        <li key={idx}>{materia.nombre}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
+                <List dense>
+                  {docenteData.carreras.map((carrera, index) => (
+                    <ListItem key={index} disablePadding>
+                      <ListItemText
+                        primaryTypographyProps={{ fontWeight: "bold" }}
+                        primary={carrera.nombre}
+                        secondary={
+                          carrera.materias && carrera.materias.length > 0
+                            ? `Materias: ${carrera.materias
+                                .map((m) => m.nombre)
+                                .join(", ")}`
+                            : "No hay materias asignadas"
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
               ) : (
                 <Typography>No hay carreras asignadas.</Typography>
               )}
             </Paper>
 
             {/* Mostrar los planes educativos */}
-            <TableContainer>
-              <Table>
-                <TableHead sx={{ backgroundColor: "#FF7043" }}>
+            <TableContainer component={Paper} elevation={3}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead
+                  sx={{ backgroundColor: theme.palette.secondary.main }}
+                >
                   <TableRow>
                     <TableCell
                       align="center"
@@ -237,8 +270,17 @@ const DataView = () => {
                   {data.length > 0 ? (
                     data.map((plan) =>
                       plan.unidades.map((unidad, index) => (
-                        <TableRow key={plan.id + "-" + index}>
-                          <TableCell align="center">{unidad.carrera}</TableCell>
+                        <TableRow
+                          key={plan.id + "-" + index}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                            backgroundColor:
+                              index % 2 === 0 ? "#F9F9F9" : "#FFF",
+                          }}
+                        >
+                          <TableCell align="center" component="th" scope="row">
+                            {unidad.carrera}
+                          </TableCell>
                           <TableCell align="center">{unidad.materia}</TableCell>
                           <TableCell align="center">
                             {unidad.objetivos}
@@ -257,7 +299,8 @@ const DataView = () => {
                             <Button
                               variant="contained"
                               color="warning"
-                              sx={{ mr: 2 }}
+                              size="small"
+                              sx={{ mr: 1 }}
                               onClick={() => handleEdit(plan)}
                             >
                               Editar
@@ -265,6 +308,7 @@ const DataView = () => {
                             <Button
                               variant="outlined"
                               color="error"
+                              size="small"
                               onClick={() => openDeleteDialog(plan.id)}
                             >
                               Eliminar
@@ -283,24 +327,28 @@ const DataView = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            {/* Dialog de confirmación para eliminar */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+              <DialogTitle>Confirmar Eliminación</DialogTitle>
+              <DialogContent>
+                ¿Estás seguro de que deseas eliminar este registro?
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenDialog(false)} color="primary">
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleDelete}
+                  color="error"
+                  variant="contained"
+                >
+                  Eliminar
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
         )}
-
-        {/* Dialog de confirmación para eliminar */}
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <DialogTitle>Confirmar Eliminación</DialogTitle>
-          <DialogContent>
-            ¿Estás seguro de que deseas eliminar este registro?
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenDialog(false)} color="primary">
-              Cancelar
-            </Button>
-            <Button onClick={handleDelete} color="error">
-              Eliminar
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Paper>
     </Container>
   );

@@ -1,7 +1,7 @@
 /* Estilo global del body */
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif; /* Usamos una fuente clara y accesible */
+  font-family: "Oswald", sans-serif; /* Cambiamos a Oswald */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #fff3e0; /* Fondo suave color melón */

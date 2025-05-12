@@ -1,3 +1,4 @@
+//Managements.js
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig"; // Asegúrate de tener correctamente configurado esto
 
@@ -6,6 +7,7 @@ export const fakeAuth = {
   userRole: localStorage.getItem("userRole") || null,
   userName: localStorage.getItem("userName") || null,
 
+  // LOGIN
   async login(username, pin, navigate, setUpdate) {
     try {
       const querySnapshot = await getDocs(collection(db, "users"));

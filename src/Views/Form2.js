@@ -5,8 +5,6 @@ import {
   Typography,
   Button,
   Container,
-  Paper,
-  Grid,
   Divider,
   Alert,
   Dialog,
@@ -16,13 +14,15 @@ import {
 } from "@mui/material";
 import { db } from "../firebaseConfig";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useTheme } from "@mui/material/styles"; // Importa el hook para el tema
 
 const Form2 = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // Obtiene el ID del plan de la URL
+  const theme = useTheme(); // Obtén el objeto del tema
 
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     unidad: "",
     objetivos: "",
@@ -35,16 +35,18 @@ const Form2 = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false); // Diálogo de confirmación para actualizar
 
   useEffect(() => {
     const fetchPlan = async () => {
       try {
+        // Crea una referencia al documento del plan educativo por su ID
         const docRef = doc(db, "planesEducativos", id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const planData = docSnap.data();
+          // Actualiza el estado del formulario con los datos del plan
           setFormData({
             unidad: planData.unidad || "",
             objetivos: planData.objetivos || "",
@@ -54,28 +56,32 @@ const Form2 = () => {
             tiempo: planData.tiempo || "",
           });
         } else {
-          setErrorMessage("El plan no existe.");
+          setErrorMessage("El plan educativo no existe.");
         }
       } catch (error) {
         console.error("Error al cargar el plan:", error);
-        setErrorMessage("Error al cargar los datos del plan.");
+        setErrorMessage("Error al cargar los datos del plan educativo.");
       }
     };
 
+    // Llama a la función para obtener los datos del plan al montar el componente
     fetchPlan();
-  }, [id]);
+  }, [id]); // El efecto se ejecuta si el ID del plan cambia
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Actualiza el estado del formulario cuando cambia un campo
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Función para validar que todos los campos del formulario estén llenos
   const validateForm = () => {
     return Object.values(formData).every((field) => field.trim() !== "");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Abre el diálogo de confirmación antes de actualizar
     setOpenDialog(true);
   };
 
@@ -88,14 +94,17 @@ const Form2 = () => {
 
     setIsLoading(true);
     try {
+      // Crea una referencia al documento del plan educativo
       const planRef = doc(db, "planesEducativos", id);
+      // Actualiza el documento con los nuevos datos del formulario
       await updateDoc(planRef, formData);
-      setSuccessMessage("Plan actualizado correctamente.");
+      setSuccessMessage("Plan educativo actualizado correctamente.");
       setErrorMessage("");
+      // Redirige al usuario a la página de visualización de datos después de un breve tiempo
       setTimeout(() => navigate("/datos"), 1500);
     } catch (error) {
-      console.error("Error al actualizar:", error);
-      setErrorMessage("Hubo un error al actualizar el plan.");
+      console.error("Error al actualizar el plan:", error);
+      setErrorMessage("Hubo un error al actualizar el plan educativo.");
     } finally {
       setIsLoading(false);
       setOpenDialog(false);
@@ -103,39 +112,36 @@ const Form2 = () => {
   };
 
   const handleCancelUpdate = () => {
+    // Cierra el diálogo de confirmación sin realizar la actualización
     setOpenDialog(false);
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 10 }}>
+    <Container maxWidth="md" sx={{ mt: 4, p: 3, borderRadius: 2 }}>
       <Typography
-        variant="h4"
+        variant="h5"
         gutterBottom
         align="center"
-        sx={{ fontWeight: "bold", color: "#FF7043" }}
+        color={theme.palette.primary.main}
       >
         Editar Plan Educativo
       </Typography>
 
-      <Divider sx={{ my: 3, borderColor: "#FF7043" }} />
+      <Divider sx={{ my: 2, borderColor: theme.palette.divider }} />
 
+      {/* Muestra mensajes de error o éxito */}
       {errorMessage && (
-        <Alert
-          severity="error"
-          sx={{ backgroundColor: "#FFCCBC", color: "#D32F2F" }}
-        >
+        <Alert severity="error" sx={{ mb: 2 }}>
           {errorMessage}
         </Alert>
       )}
       {successMessage && (
-        <Alert
-          severity="success"
-          sx={{ backgroundColor: "#C8E6C9", color: "#388E3C" }}
-        >
+        <Alert severity="success" sx={{ mb: 2 }}>
           {successMessage}
         </Alert>
       )}
 
+      {/* Formulario para editar los detalles del plan */}
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           {[
@@ -179,32 +185,20 @@ const Form2 = () => {
                 fullWidth
                 multiline={name !== "tiempo"}
                 required
+                variant="outlined"
                 helperText={helper}
-                sx={{
-                  "& .MuiInputLabel-root": { color: "#FF7043" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#FF7043" },
-                    "&:hover fieldset": { borderColor: "#FF5722" },
-                  },
-                  "& .MuiInputBase-root": { color: "#333" },
-                }}
               />
             </Grid>
           ))}
 
+          {/* Botones para actualizar y cancelar */}
           <Grid item xs={12} sm={6}>
             <Button
               type="submit"
               variant="contained"
-              color="warning"
+              color="primary"
               fullWidth
               size="large"
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1rem",
-                backgroundColor: "#FF7043",
-              }}
               disabled={isLoading}
             >
               {isLoading ? "Guardando..." : "Actualizar Plan"}
@@ -218,13 +212,6 @@ const Form2 = () => {
               color="secondary"
               fullWidth
               size="large"
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1rem",
-                borderColor: "#FF7043",
-                color: "#FF7043",
-              }}
               onClick={() => navigate("/datos")}
             >
               Cancelar
@@ -233,6 +220,7 @@ const Form2 = () => {
         </Grid>
       </Box>
 
+      {/* Diálogo de confirmación para la actualización */}
       <Dialog open={openDialog} onClose={handleCancelUpdate}>
         <DialogTitle>Confirmar Actualización</DialogTitle>
         <DialogContent>
@@ -244,7 +232,11 @@ const Form2 = () => {
           <Button onClick={handleCancelUpdate} color="secondary">
             Cancelar
           </Button>
-          <Button onClick={handleConfirmUpdate} color="primary">
+          <Button
+            onClick={handleConfirmUpdate}
+            color="primary"
+            disabled={isLoading}
+          >
             Actualizar
           </Button>
         </DialogActions>
